@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/erickzhao/redesigned-octo-disco/issues"
   },
-  "homepage": "https://github.com/erickzhao/redesigned-octo-disco#readme"
+  "homepage": "https://github.com/erickzhao/redesigned-octo-disco#readme",
+  "dependencies": {
+    "cucumber": "^5.1.0"
+  }
 }
