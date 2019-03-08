@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/erickzhao/redesigned-octo-disco#readme",
   "dependencies": {
-    "cucumber": "^5.1.0"
+    "chromedriver": "^2.46.0",
+    "cucumber": "^5.1.0",
+    "selenium-webdriver": "^4.0.0-alpha.1"
   },
   "devDependencies": {
     "eslint": "^5.15.1",
