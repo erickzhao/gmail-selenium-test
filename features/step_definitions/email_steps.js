@@ -1,12 +1,13 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable func-names */
 
-const { Given } = require('cucumber');
+const { Given, setDefaultTimeout } = require('cucumber');
 require('chromedriver');
 const { Builder, By } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
 
 const driver = new Builder().forBrowser('chrome').build();
+setDefaultTimeout(10 * 1000);
 
 const isLoggedOut = url => url.startsWith('https://accounts.google.com/signin/');
 
@@ -34,6 +35,6 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
 });
 
 Given('CurrentUser is has the New Message prompt open', async function () {
-  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/#inbox'));
+  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 10 * 1000);
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
