@@ -2,8 +2,7 @@ Feature: Sending email with image attachment
 
   Background:
     Given CurrentUser is logged into the Gmail web client
-    And CurrentUser is on the homepage
-    And the New Message prompt is open
+    And CurrentUser is has the New Message prompt open
 
   Scenario Outline: Sending emails to a valid recipient using files from Computer (Normal Flow)
     Given the New Message prompt has <recipient> email address in the recipient field
