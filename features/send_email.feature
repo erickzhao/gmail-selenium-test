@@ -1,57 +1,61 @@
 Feature: Sending email with image attachment
 
   Background:
-    Given I am logged into the Gmail web client
-    And I am on the homepage
-    And the "New Message" prompt is open
+    Given CurrentUser is logged into the Gmail web client
+    And CurrentUser is on the homepage
+    And the New Message prompt is open
 
-  Scenario: Sending email to myself with uploaded image from computer
-    Given I have my own email address in the recipient field
-    And a single image is uploaded from my local computer
-    When I send the email
-    Then the "New Message" prompt is closed
-    And the email should appear in my inbox
-    And the email should appear in my "Sent" folder
-    And the recipient should be "me"
-    And the appropriate image file should be joined as an attachment to the email
+  Scenario Outline: Sending emails to a valid recipient using files from Computer (Normal Flow)
+    Given the New Message prompt has <recipient> email address in the recipient field
+    And <cc> email address is in CC field
+    And a single <filetype> image is uploaded from my local computer
+    When email is sent
+    Then the New Message prompt is closed
+    And the email should appear in CurrentUser's inbox
+    And the email should appear in CurrentUser's Sent folder
+    And the recipient should be <recipient>
+    And the <filetype> image file should appear as an attachment to the email
 
-  Scenario: Sending email to myself with image from Google Drive
-    Given I have my own email address in the recipient field
-    And I have chosen an image from my Google Drive to upload
-    When I send the email
-    Then the "New Message" prompt is closed
-    And the email should appear in my inbox
-    And the email should appear in my "Sent" folder
-    And the recipient should be "me"
-    And the appropriate image file should be joined as an attachment to the email
+    Examples:
+      | recipient       | cc              | filetype |
+      | "CurrentUser"'s | "OtherUser"'s   | ".PNG"   |
+      | "CurrentUser"s  | "OtherUser"'s   | ".JPG"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".BMP"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".GIF"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".SVG"   |
 
-  Scenario: Sending email to someone else with uploaded image from computer
-    Given I have someone else's email address in the recipient field
-    And a single image is uploaded from my local computer
-    When I send the email
-    Then the "New Message" prompt is closed
-    And the email should not appear in my inbox
-    And the email should appear in my "Sent" folder
-    And the recipient should be the recipient's email address
-    And the appropriate image file should be joined as an attachment to the email
+  Scenario Outline: Sending emails to a valid recipient using files from Google Drive (Alternate Flow)
+    Given the New Message prompt has <recipient> email address in the recipient field
+    And <cc> email address is in CC field
+    And a single <filetype> image is chosen to be attached from Google Drive
+    When email is sent
+    Then the New Message prompt is closed
+    And the email <inbox_status> appear in CurrentUser's inbox
+    And the email should appear in CurrentUser's Sent folder
+    And the recipient should be <recipient>
+    And the <filetype> image file should appear as an attachment to the email
 
-  Scenario: Adding myself as CC in email to someone else with uploaded image from computer
-    Given I have someone else's email address in the recipient field
-    And I have my own email address in the CC field
-    And a single image is uploaded from my local computer
-    When I send the email
-    Then the "New Message" prompt is closed
-    And the email should appear in my inbox
-    And the email should appear in my "Sent" folder
-    And the recipient should be the recipient's email address
-    And my email should be listed as a CC
-    And the appropriate image file should be joined as an attachment to the email
+    Examples:
+      | recipient       | cc              | filetype |
+      | "CurrentUser"'s | "OtherUser"'s   | ".PNG"   |
+      | "CurrentUser"s  | "OtherUser"'s   | ".JPG"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".BMP"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".GIF"   |
+      | "OtherUser"'s   | "OtherUser"'s   | ".SVG"   |
 
-  Scenario: Sending image as attachment without recipient
-    Given there is no email in the recipient, CC, or BCC fields
-    And a single image is uploaded from my local computer
-    When I send the email
-    Then a modal appears asking me to specify at least one recipient
-    And the "New Message" prompt is still there with the attachment
-    And the email should not appear in my "Sent" folder
-    And the email should not appear in my inbox
+  Scenario Outline: Sending emails to invalid recipient using files from Computer (Error Flow)
+    Given the New Message prompt has <recipient> email in the recipient field
+    And <cc> email is in CC field
+    And a single <filetype> image is chosen to be attached from Google Drive
+    When email is sent
+    Then the New Message prompt should remain open with the existing information
+    And a modal warning the user of an invalid email should appear
+    And the email should not appear in CurrentUser's Sent folder
+    And the email should not appear in CurrentUser's Inbox folder
+    Examples:
+      | recipient       | cc              | filetype |
+      | "CurrentUser"'s | "InvalidUser"'s | ".PNG"   |
+      | "CurrentUser"s  | "InvalidUser"'s | ".JPG"   |
+      | "InvalidUser"'s | "CurrentUser"'s | ".BMP"   |
+      | "InvalidUser"'s | "CurrentUser"'s | ".GIF"   |
+      | "InvalidUser"'s | "InvalidUser"'s | ".SVG"   |
