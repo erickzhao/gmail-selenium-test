@@ -29,6 +29,11 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
     await passwordField.sendKeys('ecse428winter2019');
 
     const submitButton = driver.findElement(By.id('passwordNext'));
-    driver.executeScript('arguments[0].click();', submitButton);
+    await driver.executeScript('arguments[0].click();', submitButton);
   }
+});
+
+Given('CurrentUser is has the New Message prompt open', async function () {
+  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/#inbox'));
+  await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
