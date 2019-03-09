@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable func-names */
 
-const { Given, setDefaultTimeout } = require('cucumber');
+const { Given, setDefaultTimeout, When } = require('cucumber');
 require('chromedriver');
 const { Builder, By } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
@@ -37,4 +37,35 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
 Given('CurrentUser is has the New Message prompt open', async function () {
   await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 10 * 1000);
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
+});
+
+Given("the New Message prompt has {string}'s email address in the recipient field", async function (
+  user,
+) {
+  const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 20 * 1000);
+  toField.sendKeys('sobbingrabbit@gmail.com');
+});
+
+Given("{string}'s email address is in CC field", async function (user) {
+  const ccButton = driver.findElement(By.css('[aria-label^="Add Cc recipients"]'));
+  ccButton.click();
+  const ccField = driver.findElement(By.css('textarea[name="cc"]'));
+  ccField.sendKeys('erick@mailinator.com');
+});
+
+Given('some message is currently filled in', async function () {
+  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
+  this.subject = Date.now();
+  subjectField.sendKeys(`${this.subject}`);
+});
+
+Given('a single {string} image is uploaded from my local computer', async function (file) {
+  const attachButton = driver.findElement(By.name('Filedata'));
+  attachButton.sendKeys(`${process.cwd()}/images/howdy.jpg`);
+  driver.wait(until.elementLocated(By.css('[aria-label^="Attachment: howdy.jpg."]')), 20 * 1000);
+});
+
+When('email is sent', async function () {
+  const sendButton = driver.findElement(By.css('[aria-label^="Send"]'));
+  sendButton.click();
 });
