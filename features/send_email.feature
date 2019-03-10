@@ -15,11 +15,11 @@ Feature: Sending email with image attachment
 
     Examples:
       | recipient     | cc            | filetype |
-      | "CurrentUser" | "OtherUser"   | ".png"   |
-      | "CurrentUser" | "OtherUser"   | ".jpg"   |
-      | "OtherUser"   | "CurrentUser" | ".tiff"  |
-      | "OtherUser"   | "CurrentUser" | ".gif"   |
-      | "OtherUser"   | "CurrentUser" | ".svg"   |
+      | "CurrentUser" | "OtherUser-1"  | ".png"   |
+      | "CurrentUser" | "OtherUser-2"  | ".jpg"   |
+      | "OtherUser-3"  | "CurrentUser" | ".tiff"  |
+      | "OtherUser-4"  | "CurrentUser" | ".gif"   |
+      | "OtherUser-5"  | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to a valid recipient using files from Google Drive (Alternate Flow)
     Given an email draft is addressed to <recipient> with <cc> as a Cc
@@ -32,11 +32,11 @@ Feature: Sending email with image attachment
 
     Examples:
       | recipient     | cc            | filetype |
-      | "CurrentUser" | "OtherUser"   | ".png"   |
-      | "CurrentUser" | "OtherUser"   | ".jpg"   |
-      | "OtherUser"   | "CurrentUser" | ".tiff"  |
-      | "OtherUser"   | "CurrentUser" | ".gif"   |
-      | "OtherUser"   | "CurrentUser" | ".svg"   |
+      | "CurrentUser" | "OtherUser-1"  | ".png"   |
+      | "CurrentUser" | "OtherUser-2"  | ".jpg"   |
+      | "OtherUser-3"  | "CurrentUser" | ".tiff"  |
+      | "OtherUser-4"  | "CurrentUser" | ".gif"   |
+      | "OtherUser-5"  | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to invalid recipient using files from Computer (Error Flow)
     Given an email draft is addressed to <recipient> with <cc> as a Cc
@@ -46,9 +46,9 @@ Feature: Sending email with image attachment
     And the user should be warned that the recipients are invalid
     And the email should not be sent
     Examples:
-      | recipient     | cc            | filetype |
-      | "CurrentUser" | "InvalidUser" | ".png"   |
-      | "CurrentUser" | "InvalidUser" | ".jpg"   |
-      | "InvalidUser" | "CurrentUser" | ".tiff"  |
-      | "InvalidUser" | "CurrentUser" | ".gif"   |
-      | "InvalidUser" | "InvalidUser" | ".svg"   |
+      | recipient      | cc             | filetype |
+      | "CurrentUser"  | "InvalidUser-1" | ".png"   |
+      | "CurrentUser"  | "InvalidUser-2" | ".jpg"   |
+      | "InvalidUser-3" | "CurrentUser"  | ".tiff"  |
+      | "InvalidUser-4" | "CurrentUser"  | ".gif"   |
+      | "InvalidUser-5" | "InvalidUser"  | ".svg"   |

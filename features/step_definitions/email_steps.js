@@ -19,7 +19,19 @@ const driver = new Builder().forBrowser('chrome').build();
 setDefaultTimeout(45 * 1000);
 
 const isLoggedOut = url => url.startsWith('https://accounts.google.com/signin/');
-const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
+
+const getUserEmail = (user) => {
+  const [userType, userNumber] = user.split('-');
+  let email;
+
+  if (!userNumber) {
+    email = Users[userType];
+  } else {
+    email = Users[userType][userNumber - 1];
+  }
+
+  return email;
+};
 
 Given('CurrentUser is logged into the Gmail web client', async function () {
   const url = await driver.getCurrentUrl();
@@ -56,8 +68,8 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   recipient,
   Cc,
 ) {
-  this.recipientUser = Users[recipient];
-  this.ccUser = Users[Cc];
+  this.recipientUser = getUserEmail(recipient);
+  this.ccUser = getUserEmail(Cc);
   this.subject = Date.now();
 
   const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 45 * 1000);
