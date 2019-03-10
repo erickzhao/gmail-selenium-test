@@ -2,62 +2,53 @@ Feature: Sending email with image attachment
 
   Background:
     Given CurrentUser is logged into the Gmail web client
-    And CurrentUser is has the New Message prompt open
+    And CurrentUser is composing a new message
 
   Scenario Outline: Sending emails to a valid recipient using files from Computer (Normal Flow)
-    Given the New Message prompt has <recipient> email address in the recipient field
-    And <cc> email address is in CC field
-    And some message is currently filled in
-    And a single <filetype> image is uploaded from my local computer
+    Given an email draft is addressed to <recipient> with <cc> as a Cc
+    And a single <filetype> image is attached from CurrentUser's local computer
     When email is sent
-    Then an alert should appear telling CurrentUser that the email was sent
-    And the New Message prompt should be closed
-    And the email should appear in CurrentUser's "inbox" folder
-    And the email should appear in CurrentUser's "sent" folder
-    And the email's details should be accessible
+    Then CurrentUser should be alerted that the email was sent successfully
+    And the draft should no longer be available
+    And the email should be sent
+    And the email's details should correspond to the original draft that was sent
 
     Examples:
-      | recipient       | cc              | filetype |
-      | "CurrentUser"'s | "OtherUser"'s   | ".png"   |
-      | "CurrentUser"'s | "OtherUser"'s   | ".jpg"   |
-      | "OtherUser"'s   | "CurrentUser"'s | ".tiff"  |
-      | "OtherUser"'s   | "CurrentUser"'s | ".gif"   |
-      | "OtherUser"'s   | "CurrentUser"'s | ".svg"   |
+      | recipient     | cc            | filetype |
+      | "CurrentUser" | "OtherUser"   | ".png"   |
+      | "CurrentUser" | "OtherUser"   | ".jpg"   |
+      | "OtherUser"   | "CurrentUser" | ".tiff"  |
+      | "OtherUser"   | "CurrentUser" | ".gif"   |
+      | "OtherUser"   | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to a valid recipient using files from Google Drive (Alternate Flow)
-    Given the New Message prompt has <recipient> email address in the recipient field
-    And <cc> email address is in CC field
-    And some message is currently filled in
+    Given an email draft is addressed to <recipient> with <cc> as a Cc
     And a single <filetype> image is chosen to be attached from Google Drive
     When email is sent
-    Then an alert should appear telling CurrentUser that the email was sent
-    And the New Message prompt should be closed
-    And the email should appear in CurrentUser's "inbox" folder
-    And the email should appear in CurrentUser's "sent" folder
-    And the email's details should be accessible
+    Then CurrentUser should be alerted that the email was sent successfully
+    And the draft should no longer be available
+    And the email should be sent
+    And the email's details should correspond to the original draft that was sent
 
     Examples:
-      | recipient       | cc              | filetype |
-      | "CurrentUser"'s | "OtherUser"'s   | ".png"   |
-      | "CurrentUser"'s | "OtherUser"'s   | ".jpg"   |
-      | "OtherUser"'s   | "CurrentUser"'s | ".tiff"  |
-      | "OtherUser"'s   | "CurrentUser"'s | ".gif"   |
-      | "OtherUser"'s   | "CurrentUser"'s | ".svg"   |
+      | recipient     | cc            | filetype |
+      | "CurrentUser" | "OtherUser"   | ".png"   |
+      | "CurrentUser" | "OtherUser"   | ".jpg"   |
+      | "OtherUser"   | "CurrentUser" | ".tiff"  |
+      | "OtherUser"   | "CurrentUser" | ".gif"   |
+      | "OtherUser"   | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to invalid recipient using files from Computer (Error Flow)
-    Given the New Message prompt has <recipient> email address in the recipient field
-    And <cc> email address is in CC field
-    And some message is currently filled in
-    And a single <filetype> image is uploaded from my local computer
+    Given an email draft is addressed to <recipient> with <cc> as a Cc
+    And a single <filetype> image is attached from CurrentUser's local computer
     When email is sent
-    Then the New Message prompt should remain open with the existing information
-    And a modal warning the user of an invalid email should appear
-    And the email should not appear in CurrentUser's "sent" folder
-    And the email should not appear in CurrentUser's "inbox" folder
+    Then the draft should remain open
+    And the user should be warned that the recipients are invalid
+    And the email should not be sent
     Examples:
-      | recipient       | cc              | filetype |
-      | "CurrentUser"'s | "InvalidUser"'s | ".png"   |
-      | "CurrentUser"'s  | "InvalidUser"'s | ".jpg"   |
-      | "InvalidUser"'s | "CurrentUser"'s | ".tiff"  |
-      | "InvalidUser"'s | "CurrentUser"'s | ".gif"   |
-      | "InvalidUser"'s | "InvalidUser"'s | ".svg"   |
+      | recipient     | cc            | filetype |
+      | "CurrentUser" | "InvalidUser" | ".png"   |
+      | "CurrentUser" | "InvalidUser" | ".jpg"   |
+      | "InvalidUser" | "CurrentUser" | ".tiff"  |
+      | "InvalidUser" | "CurrentUser" | ".gif"   |
+      | "InvalidUser" | "InvalidUser" | ".svg"   |

@@ -5,7 +5,7 @@ require('chromedriver');
 const { Builder, By } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
 const {
-  After, Given, setDefaultTimeout, Then, When,
+  Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -47,35 +47,32 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
   }
 });
 
-Given('CurrentUser is has the New Message prompt open', async function () {
+Given('CurrentUser is composing a new message', async function () {
   await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 45 * 1000);
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
 
-Given("the New Message prompt has {string}'s email address in the recipient field", async function (
-  user,
+Given('an email draft is addressed to {string} with {string} as a Cc', async function (
+  recipient,
+  Cc,
 ) {
-  this.recipientUser = Users[user];
+  this.recipientUser = Users[recipient];
+  this.ccUser = Users[Cc];
+  this.subject = Date.now();
+
   const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 45 * 1000);
+  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
   await toField.sendKeys(this.recipientUser);
-});
-
-Given("{string}'s email address is in CC field", async function (user) {
-  this.ccUser = Users[user];
-
   const ccButton = driver.findElement(By.css('[aria-label^="Add Cc recipients"]'));
   await ccButton.click();
   const ccField = driver.findElement(By.css('textarea[name="cc"]'));
   await ccField.sendKeys(this.ccUser);
-});
-
-Given('some message is currently filled in', async function () {
-  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
-  this.subject = Date.now();
   await subjectField.sendKeys(`${this.subject}`);
 });
 
-Given('a single {string} image is uploaded from my local computer', async function (extension) {
+Given("a single {string} image is attached from CurrentUser's local computer", async function (
+  extension,
+) {
   this.attachmentExtension = extension;
   const attachButton = driver.findElement(By.name('Filedata'));
   await attachButton.sendKeys(`${process.cwd()}/images/howdy${this.attachmentExtension}`);
@@ -86,7 +83,7 @@ When('email is sent', async function () {
   sendButton.click();
 });
 
-Then('an alert should appear telling CurrentUser that the email was sent', async function () {
+Then('CurrentUser should be alerted that the email was sent successfully', async function () {
   const alert = await driver.wait(
     until.elementLocated(By.xpath('//div[@role="alert" and contains(., "Message sent.")]')),
     45 * 1000,
@@ -95,15 +92,28 @@ Then('an alert should appear telling CurrentUser that the email was sent', async
   expect(alert).to.be.a('object');
 });
 
-Then('the New Message prompt should be closed', async function () {
+Then('the draft should no longer be available', async function () {
   return expect(
     driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
   ).to.be.rejectedWith('no such element');
 });
 
-Then("the email should appear in CurrentUser's {string} folder", async function (folder) {
-  await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
-  await driver.wait(until.titleContains(`${capitalize(folder)}`));
+Then('the email should be sent', async function () {
+  await driver.get('https://mail.google.com/mail/u/0/#sent');
+  await driver.wait(until.titleContains('Sent'));
+  driver.wait(
+    until.elementLocated(
+      By.xpath(
+        `//div[@role="main"]/descendant::span[contains(., "${
+          this.subject
+        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
+      ),
+    ),
+    20 * 1000,
+  );
+
+  await driver.get('https://mail.google.com/mail/u/0/#inbox');
+  await driver.wait(until.titleContains('Inbox'));
 
   this.sentEmailLink = driver.wait(
     until.elementLocated(
@@ -118,9 +128,22 @@ Then("the email should appear in CurrentUser's {string} folder", async function 
   expect(this.sentEmailLink).to.be.a('object');
 });
 
-Then("the email should not appear in CurrentUser's {string} folder", async function (folder) {
-  await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
-  await driver.wait(until.titleContains(`${capitalize(folder)}`));
+Then('the email should not be sent', async function () {
+  await driver.get('https://mail.google.com/mail/u/0/#sent');
+  await driver.wait(until.titleContains('Sent'));
+
+  expect(
+    driver.findElement(
+      By.xpath(
+        `//div[@role="main"]/descendant::span[contains(., "${
+          this.subject
+        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
+      ),
+    ),
+  ).to.be.rejectedWith('no such element');
+
+  await driver.get('https://mail.google.com/mail/u/0/#inbox');
+  await driver.wait(until.titleContains('Inbox'));
 
   return expect(
     driver.findElement(
@@ -133,7 +156,7 @@ Then("the email should not appear in CurrentUser's {string} folder", async funct
   ).to.be.rejectedWith('no such element');
 });
 
-Then("the email's details should be accessible", async function () {
+Then("the email's details should correspond to the original draft that was sent", async function () {
   this.sentEmailLink.click();
   await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`), 45 * 10000);
 
@@ -209,7 +232,7 @@ Given('a single {string} image is chosen to be attached from Google Drive', asyn
   attachButton.click();
 });
 
-Then('the New Message prompt should remain open with the existing information', async function () {
+Then('the draft should remain open', async function () {
   expect(
     await driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
   ).to.be.a('object');
@@ -237,7 +260,7 @@ Then('the New Message prompt should remain open with the existing information', 
   ).to.be.a('object');
 });
 
-Then('a modal warning the user of an invalid email should appear', async function () {
+Then('the user should be warned that the recipients are invalid', async function () {
   expect(
     await driver.wait(
       until.elementLocated(
@@ -254,7 +277,14 @@ Then('a modal warning the user of an invalid email should appear', async functio
   );
 
   await modalExit.click();
-  await driver.wait(until.elementIsNotVisible(modalExit));
+
+  try {
+    await driver.wait(until.elementIsNotVisible(modalExit));
+  } catch (e) {
+    if (!e.message.includes('stale')) {
+      throw e;
+    }
+  }
 
   const draft = await driver.findElement(
     By.xpath('//div[@role="button" and @aria-label="Discard draft"]'),
