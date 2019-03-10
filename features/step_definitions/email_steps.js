@@ -2,7 +2,7 @@
 /* eslint-disable func-names */
 require('chromedriver');
 
-const { Builder, By } = require('selenium-webdriver');
+const { Builder } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
 const {
   After, Given, setDefaultTimeout, Then, When,
@@ -77,7 +77,7 @@ Given("a single {string} image is attached from CurrentUser's local computer", a
   extension,
 ) {
   this.attachmentExtension = extension;
-  const attachButton = driver.findElement(By.name('Filedata'));
+  const attachButton = driver.findElement(locators.attach.fromComputerButton);
   await attachButton.sendKeys(`${process.cwd()}/images/howdy${this.attachmentExtension}`);
 });
 
@@ -101,16 +101,7 @@ Then('the draft should no longer be available', async function () {
 Then('the email should be sent', async function () {
   await driver.get('https://mail.google.com/mail/u/0/#sent');
   await driver.wait(until.titleContains('Sent'));
-  driver.wait(
-    until.elementLocated(
-      By.xpath(
-        `//div[@role="main"]/descendant::span[contains(., "${
-          this.subject
-        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
-      ),
-    ),
-    20 * 1000,
-  );
+  driver.wait(until.elementLocated(locators.verify.sent.emailInFolder(this.subject)), 20 * 1000);
 
   await driver.get('https://mail.google.com/mail/u/0/#inbox');
   await driver.wait(until.titleContains('Inbox'));
@@ -142,9 +133,7 @@ Then("the email's details should correspond to the original draft that was sent"
   this.sentEmailLink.click();
   await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`), 45 * 10000);
 
-  const showDetails = await driver.findElement(
-    By.xpath('//img[@role="button" and @aria-label="Show details"]'),
-  );
+  const showDetails = await driver.findElement(locators.verify.sent.showDetailsButton);
   showDetails.click();
 
   const attachment = await driver.findElement(
