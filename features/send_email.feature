@@ -12,10 +12,9 @@ Feature: Sending email with image attachment
     When email is sent
     Then an alert should appear telling CurrentUser that the email was sent
     And the New Message prompt should be closed
-    #   And the email should appear in CurrentUser's inbox
-    #   And the email should appear in CurrentUser's Sent folder
-    #   And the recipient should be <recipient>
-    #   And the <filetype> image file should appear as an attachment to the email
+    And the email should appear in CurrentUser's "inbox" folder
+    And the email should appear in CurrentUser's "sent" folder
+    And the email's details should be accessible
 
     Examples:
       | recipient       | cc            | filetype |

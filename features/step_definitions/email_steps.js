@@ -42,14 +42,14 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
 });
 
 Given('CurrentUser is has the New Message prompt open', async function () {
-  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 20 * 1000);
+  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 30 * 1000);
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
 
 Given("the New Message prompt has {string}'s email address in the recipient field", async function (
   user,
 ) {
-  const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 20 * 1000);
+  const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 30 * 1000);
   await toField.sendKeys('sobbingrabbit@gmail.com');
 });
 
@@ -86,7 +86,60 @@ Then('an alert should appear telling CurrentUser that the email was sent', async
 });
 
 Then('the New Message prompt should be closed', async function () {
-  expect(
+  return expect(
     driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
   ).to.be.rejectedWith('no such element');
+});
+
+Then("the email should appear in CurrentUser's {string} folder", async function (folder) {
+  await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
+
+  this.sentEmailLink = await driver.findElement(By.xpath(`//td[contains(., "${this.subject}")]`));
+
+  expect(this.sentEmailLink).to.be.a('object');
+});
+
+Then("the email should not appear in CurrentUser's {string} folder", async function (folder) {
+  await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
+
+  return expect(
+    driver.findElement(By.xpath(`//td[contains(., "${this.subject}")]`)),
+  ).to.be.rejectedWith('no such element');
+});
+
+Then("the email's details should be accessible", async function () {
+  this.sentEmailLink.click();
+  await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`), 10 * 10000);
+
+  const showDetails = await driver.findElement(
+    By.xpath('//img[@role="button" and @aria-label="Show details"]'),
+  );
+  showDetails.click();
+
+  const attachment = await driver.findElement(
+    By.xpath('//span[contains(., "Preview attachment howdy.jpg")]'),
+  );
+
+  const sender = await driver.findElement(
+    By.xpath(
+      '//span[contains(., "from:")]/parent::td/following-sibling::td/descendant::span[@email="sobbingrabbit@gmail.com"]',
+    ),
+  );
+
+  const recipient = await driver.findElement(
+    By.xpath(
+      '//span[contains(., "to:")]/parent::td/following-sibling::td/descendant::span[@email="sobbingrabbit@gmail.com"]',
+    ),
+  );
+
+  const cc = await driver.findElement(
+    By.xpath(
+      '//span[contains(., "cc:")]/parent::td/following-sibling::td/descendant::span[@email="erick@mailinator.com"]',
+    ),
+  );
+
+  expect(attachment).to.be.a('object');
+  expect(sender).to.be.a('object');
+  expect(recipient).to.be.a('object');
+  expect(cc).to.be.a('object');
 });
