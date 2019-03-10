@@ -4,10 +4,10 @@ const until = require('selenium-webdriver/lib/until');
 const { After } = require('../../lib/cucumber');
 const driver = require('../../lib/driver');
 const locators = require('../../lib/locators');
+const { goToSentFolder, goToInboxFolder } = require('../../lib/utils');
 
 After(async () => {
-  await driver.get('https://mail.google.com/mail/u/0/#sent');
-  await driver.wait(until.titleContains('Sent'));
+  await goToSentFolder();
 
   const noEmails = await driver.findElements(locators.after.emptyFolder);
 
@@ -18,4 +18,6 @@ After(async () => {
     await driver.wait(until.elementIsVisible(deleteEmailsButton));
     await deleteEmailsButton.click();
   }
+
+  await goToInboxFolder();
 });

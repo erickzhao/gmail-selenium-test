@@ -4,7 +4,7 @@ const until = require('selenium-webdriver/lib/until');
 const { expect } = require('../../lib/chai');
 const { Given, When, Then } = require('../../lib/cucumber');
 const driver = require('../../lib/driver');
-const { getUserEmail } = require('../../lib/utils');
+const { getUserEmail, goToInboxFolder, goToSentFolder } = require('../../lib/utils');
 const locators = require('../../lib/locators');
 const { Credentials } = require('../../lib/users');
 
@@ -62,13 +62,10 @@ Then('the draft should no longer be available', async function () {
 });
 
 Then('the email should be sent', async function () {
-  await driver.get('https://mail.google.com/mail/u/0/#sent');
-  await driver.wait(until.titleContains('Sent'));
+  await goToSentFolder();
   driver.wait(until.elementLocated(locators.verify.sent.emailInFolder(this.subject)));
 
-  await driver.get('https://mail.google.com/mail/u/0/#inbox');
-  await driver.wait(until.titleContains('Inbox'));
-
+  await goToInboxFolder();
   this.sentEmailLink = driver.wait(
     until.elementLocated(locators.verify.sent.emailInFolder(this.subject)),
   );
@@ -77,16 +74,12 @@ Then('the email should be sent', async function () {
 });
 
 Then('the email should not be sent', async function () {
-  await driver.get('https://mail.google.com/mail/u/0/#sent');
-  await driver.wait(until.titleContains('Sent'));
-
+  await goToSentFolder();
   expect(driver.findElement(locators.verify.sent.emailInFolder(this.subject))).to.be.rejectedWith(
     'no such element',
   );
 
-  await driver.get('https://mail.google.com/mail/u/0/#inbox');
-  await driver.wait(until.titleContains('Inbox'));
-
+  await goToInboxFolder();
   return expect(
     driver.findElement(locators.verify.sent.emailInFolder(this.subject)),
   ).to.be.rejectedWith('no such element');
