@@ -17,12 +17,12 @@ Feature: Sending email with image attachment
     And the email's details should be accessible
 
     Examples:
-      | recipient       | cc            | filetype |
-      | "CurrentUser"'s | "OtherUser"'s | ".PNG"   |
-#     | "CurrentUser"s  | "OtherUser"'s   | ".JPG"   |
-#     | "OtherUser"'s   | "CurrentUser"'s | ".BMP"   |
-#     | "OtherUser"'s   | "CurrentUser"'s | ".GIF"   |
-#     | "OtherUser"'s   | "CurrentUser"'s | ".SVG"   |
+      | recipient       | cc              | filetype |
+      | "CurrentUser"'s | "OtherUser"'s   | ".png"   |
+      | "CurrentUser"'s | "OtherUser"'s   | ".jpg"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".tiff"  |
+      | "OtherUser"'s   | "CurrentUser"'s | ".gif"   |
+      | "OtherUser"'s   | "CurrentUser"'s | ".svg"   |
 
 # Scenario Outline: Sending emails to a valid recipient using files from Google Drive (Alternate Flow)
 #   Given the New Message prompt has <recipient> email address in the recipient field
