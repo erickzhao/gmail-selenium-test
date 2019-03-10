@@ -103,7 +103,10 @@ Then('the New Message prompt should be closed', async function () {
 Then("the email should appear in CurrentUser's {string} folder", async function (folder) {
   await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
 
-  this.sentEmailLink = await driver.findElement(By.xpath(`//td[contains(., "${this.subject}")]`));
+  this.sentEmailLink = await driver.wait(
+    until.elementLocated(By.xpath(`//td[contains(., "${this.subject}")]`)),
+    30 * 1000,
+  );
 
   expect(this.sentEmailLink).to.be.a('object');
 });
@@ -155,4 +158,39 @@ Then("the email's details should be accessible", async function () {
   expect(sender).to.be.a('object');
   expect(recipient).to.be.a('object');
   expect(cc).to.be.a('object');
+});
+
+Given('a single {string} image is chosen to be attached from Google Drive', async function (
+  extension,
+) {
+  this.attachmentExtension = extension;
+
+  const googleDriveButton = await driver.findElement(
+    By.xpath('//div[@aria-label="Insert files using Drive"]'),
+  );
+  googleDriveButton.click();
+
+  const drivePickerFrame = await await driver.wait(
+    until.elementLocated(By.xpath('//iframe[contains(@src, "docs.google.com/picker")]')),
+    30 * 1000,
+  );
+
+  await driver.switchTo().frame(drivePickerFrame);
+
+  const attachmentIcon = await driver.wait(
+    until.elementLocated(
+      By.xpath(`//div[contains(@aria-label, "howdy${this.attachmentExtension}")]`),
+      30 * 1000,
+    ),
+  );
+
+  const asAttachmentButton = await driver.findElement(
+    By.xpath('//div[@role="button" and @value="attach"]'),
+  );
+
+  const attachButton = await driver.findElement(By.xpath('//div[@role="button" and . = "Insert"]'));
+
+  attachmentIcon.click();
+  asAttachmentButton.click();
+  attachButton.click();
 });
