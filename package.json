@@ -1,21 +1,24 @@
 {
-  "name": "redesigned-octo-disco",
+  "name": "gmail-selenium-test",
   "version": "0.1.0",
-  "description": "",
+  "description": "E2E testing Gmail (sending mail + image attachments)",
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/erickzhao/redesigned-octo-disco.git"
+    "url": "git+https://github.com/erickzhao/gmail-selenium-test.git"
   },
-  "author": "",
+  "author": {
+    "name": "Erick Zhao",
+    "email": "erick.zhao@mail.mcgill.ca"
+  },
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/erickzhao/redesigned-octo-disco/issues"
+    "url": "https://github.com/erickzhao/gmail-selenium-test/issues"
   },
-  "homepage": "https://github.com/erickzhao/redesigned-octo-disco#readme",
+  "homepage": "https://github.com/erickzhao/gmail-selenium-test#readme",
   "dependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
