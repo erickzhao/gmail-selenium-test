@@ -165,6 +165,7 @@ Then('the draft should remain open', async function () {
   expect(ccInfo).to.be.a('object');
 
   expect(subject).to.be.a('object');
+  expect(body).to.be.a('object');
 });
 
 Then('the user should be warned that the recipients are invalid', async function () {
