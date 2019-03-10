@@ -51,4 +51,4 @@ Feature: Sending email with image attachment
       | "CurrentUser"  | "InvalidUser-2" | ".jpg"   |
       | "InvalidUser-3" | "CurrentUser"  | ".tiff"  |
       | "InvalidUser-4" | "CurrentUser"  | ".gif"   |
-      | "InvalidUser-5" | "InvalidUser"  | ".svg"   |
+      | "InvalidUser-5" | "CurrentUser"  | ".svg"   |
