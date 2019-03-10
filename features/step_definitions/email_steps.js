@@ -7,11 +7,7 @@ const until = require('selenium-webdriver/lib/until');
 const {
   After, Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-
-chai.use(chaiAsPromised);
-const { expect } = chai;
+const { expect } = require('../../lib/chai');
 
 const { Users } = require('../../lib/users');
 
