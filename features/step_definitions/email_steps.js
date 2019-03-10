@@ -1,18 +1,13 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable func-names */
-require('chromedriver');
-
-const { Builder } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
-const {
-  After, Given, setDefaultTimeout, Then, When,
-} = require('cucumber');
 const { expect } = require('../../lib/chai');
+const {
+  Given, When, Then, After,
+} = require('../../lib/cucumber');
+const driver = require('../../lib/driver');
 const { getUserEmail, isLoggedOut } = require('../../lib/utils');
 const locators = require('../../lib/locators');
-
-const driver = new Builder().forBrowser('chrome').build();
-setDefaultTimeout(45 * 1000);
 
 Given('CurrentUser is logged into the Gmail web client', async function () {
   const url = await driver.getCurrentUrl();
