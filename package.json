@@ -18,6 +18,7 @@
   "homepage": "https://github.com/erickzhao/redesigned-octo-disco#readme",
   "dependencies": {
     "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
     "chromedriver": "^2.46.0",
     "cucumber": "^5.1.0",
     "selenium-webdriver": "^4.0.0-alpha.1"
