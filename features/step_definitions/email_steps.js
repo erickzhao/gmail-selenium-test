@@ -5,7 +5,7 @@ require('chromedriver');
 const { Builder, By } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
 const {
-  Given, setDefaultTimeout, Then, When,
+  After, Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -19,6 +19,7 @@ const driver = new Builder().forBrowser('chrome').build();
 setDefaultTimeout(45 * 1000);
 
 const isLoggedOut = url => url.startsWith('https://accounts.google.com/signin/');
+const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 Given('CurrentUser is logged into the Gmail web client', async function () {
   const url = await driver.getCurrentUrl();
@@ -102,10 +103,16 @@ Then('the New Message prompt should be closed', async function () {
 
 Then("the email should appear in CurrentUser's {string} folder", async function (folder) {
   await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
+  await driver.wait(until.titleContains(`${capitalize(folder)}`));
 
-  this.sentEmailLink = await driver.wait(
-    until.elementLocated(By.xpath(`//td[contains(., "${this.subject}")]`)),
-    30 * 1000,
+  this.sentEmailLink = driver.wait(
+    until.elementLocated(
+      By.xpath(
+        `//div[@role="main"]/descendant::span[contains(., "${
+          this.subject
+        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
+      ),
+    ),
   );
 
   expect(this.sentEmailLink).to.be.a('object');
@@ -113,9 +120,16 @@ Then("the email should appear in CurrentUser's {string} folder", async function 
 
 Then("the email should not appear in CurrentUser's {string} folder", async function (folder) {
   await driver.get(`https://mail.google.com/mail/u/0/#${folder}`);
+  await driver.wait(until.titleContains(`${capitalize(folder)}`));
 
   return expect(
-    driver.findElement(By.xpath(`//td[contains(., "${this.subject}")]`)),
+    driver.findElement(
+      By.xpath(
+        `//div[@role="main"]/descendant::span[contains(., "${
+          this.subject
+        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
+      ),
+    ),
   ).to.be.rejectedWith('no such element');
 });
 
@@ -193,4 +207,65 @@ Given('a single {string} image is chosen to be attached from Google Drive', asyn
   attachmentIcon.click();
   asAttachmentButton.click();
   attachButton.click();
+});
+
+Then('the New Message prompt should remain open with the existing information', async function () {
+  expect(
+    await driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
+  ).to.be.a('object');
+  expect(
+    await driver.findElement(
+      By.xpath(
+        `//input[@type="hidden" and @name="to" and contains(@value, "${this.recipientUser}")]`,
+      ),
+    ),
+  ).to.be.a('object');
+  expect(
+    await driver.findElement(
+      By.xpath(`//input[@type="hidden" and @name="cc" and contains(@value, "${this.ccUser}")]`),
+    ),
+  ).to.be.a('object');
+  expect(
+    await driver.wait(
+      until.elementLocated(
+        By.xpath(
+          `//input[@type="hidden" and @name="subject" and contains(@value, "${this.subject}")]`,
+        ),
+      ),
+      10 * 1000,
+    ),
+  ).to.be.a('object');
+});
+
+Then('a modal warning the user of an invalid email should appear', async function () {
+  expect(
+    await driver.wait(
+      until.elementLocated(
+        By.xpath(
+          '//div[@role="alertdialog" and contains(.,"Please make sure that all addresses are properly formed.")]',
+        ),
+      ),
+      10 * 1000,
+    ),
+  ).to.be.a('object');
+
+  const modalExit = await driver.findElement(
+    By.xpath('//div[@role="alertdialog"]/descendant::span[@role="button" and @aria-label="Close"]'),
+  );
+
+  await modalExit.click();
+  await driver.wait(until.elementIsNotVisible(modalExit));
+
+  const draft = await driver.findElement(
+    By.xpath('//div[@role="button" and @aria-label="Discard draft"]'),
+  );
+  await draft.click();
+
+  try {
+    await driver.wait(until.elementIsNotVisible(draft));
+  } catch (e) {
+    if (!e.message.includes('stale')) {
+      throw e;
+    }
+  }
 });
