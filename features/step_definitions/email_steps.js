@@ -16,7 +16,7 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   this.subject = Date.now();
   this.body = `On ${new Date().toUTCString()}, the sobbing rabbit says howdy!`;
 
-  const toField = await driver.wait(until.elementLocated(locators.compose.toField), 45 * 1000);
+  const toField = await driver.wait(until.elementLocated(locators.compose.toField));
   await driver.wait(until.elementIsVisible(toField));
   await toField.sendKeys(this.recipientUser);
 
@@ -49,7 +49,7 @@ When('email is sent', async function () {
 });
 
 Then('CurrentUser should be alerted that the email was sent successfully', async function () {
-  const alert = await driver.wait(until.elementLocated(locators.send.sentAlert), 45 * 1000);
+  const alert = await driver.wait(until.elementLocated(locators.send.sentAlert));
 
   expect(alert).to.be.a('object');
 });
@@ -63,13 +63,13 @@ Then('the draft should no longer be available', async function () {
 Then('the email should be sent', async function () {
   await driver.get('https://mail.google.com/mail/u/0/#sent');
   await driver.wait(until.titleContains('Sent'));
-  driver.wait(until.elementLocated(locators.verify.sent.emailInFolder(this.subject)), 20 * 1000);
+  driver.wait(until.elementLocated(locators.verify.sent.emailInFolder(this.subject)));
 
   await driver.get('https://mail.google.com/mail/u/0/#inbox');
   await driver.wait(until.titleContains('Inbox'));
 
   this.sentEmailLink = driver.wait(
-    until.elementLocated(locators.verify.sent.emailInFolder(this.subject), 10 * 1000),
+    until.elementLocated(locators.verify.sent.emailInFolder(this.subject)),
   );
 
   expect(this.sentEmailLink).to.be.a('object');
@@ -93,7 +93,7 @@ Then('the email should not be sent', async function () {
 
 Then("the email's details should correspond to the original draft that was sent", async function () {
   this.sentEmailLink.click();
-  await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`), 45 * 10000);
+  await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`));
 
   const showDetails = await driver.findElement(locators.verify.sent.showDetailsButton);
   showDetails.click();
@@ -131,16 +131,12 @@ Given('a single {string} image is chosen to be attached from Google Drive', asyn
 
   const drivePickerFrame = await await driver.wait(
     until.elementLocated(locators.attach.drive.pickerFrame),
-    30 * 1000,
   );
 
   await driver.switchTo().frame(drivePickerFrame);
 
   const attachmentIcon = await driver.wait(
-    until.elementLocated(
-      locators.attach.drive.attachmentSelect(this.attachmentExtension),
-      30 * 1000,
-    ),
+    until.elementLocated(locators.attach.drive.attachmentSelect(this.attachmentExtension)),
   );
 
   const asAttachmentButton = await driver.findElement(locators.attach.drive.asAttachmentButton);
@@ -159,17 +155,12 @@ Then('the draft should remain open', async function () {
   ).to.be.a('object');
   expect(await driver.findElement(locators.verify.unsent.ccInfo(this.ccUser))).to.be.a('object');
   expect(
-    await driver.wait(
-      until.elementLocated(locators.verify.unsent.subject(this.subject)),
-      10 * 1000,
-    ),
+    await driver.wait(until.elementLocated(locators.verify.unsent.subject(this.subject))),
   ).to.be.a('object');
 });
 
 Then('the user should be warned that the recipients are invalid', async function () {
-  expect(await driver.wait(until.elementLocated(locators.send.invalidAlert), 10 * 1000)).to.be.a(
-    'object',
-  );
+  expect(await driver.wait(until.elementLocated(locators.send.invalidAlert))).to.be.a('object');
 
   const modalExit = await driver.findElement(locators.send.invalidAlertExit);
 

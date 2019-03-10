@@ -20,11 +20,8 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
     await emailField.sendKeys('sobbingrabbit@gmail.com');
     await nextButton.click();
 
-    const passwordField = await driver.wait(
-      until.elementLocated(locators.signin.passwordField),
-      45 * 1000,
-    );
-    await driver.wait(until.elementIsVisible(passwordField), 45 * 1000);
+    const passwordField = await driver.wait(until.elementLocated(locators.signin.passwordField));
+    await driver.wait(until.elementIsVisible(passwordField));
     await passwordField.sendKeys('ecse428winter2019');
 
     const submitButton = driver.findElement(locators.signin.submitButton);
@@ -33,6 +30,6 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
 });
 
 Given('CurrentUser is composing a new message', async function () {
-  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 45 * 1000);
+  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'));
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
