@@ -71,6 +71,7 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   this.recipientUser = getUserEmail(recipient);
   this.ccUser = getUserEmail(Cc);
   this.subject = Date.now();
+  this.body = `On ${new Date().toUTCString()}, the sobbing rabbit says howdy!`;
 
   const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 45 * 1000);
   const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
@@ -81,6 +82,8 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   await driver.wait(until.elementIsVisible(ccField));
   await ccField.sendKeys(this.ccUser);
   await subjectField.sendKeys(`${this.subject}`);
+  const bodyField = driver.findElement(By.xpath('//div[@aria-label="Message Body"]'));
+  await bodyField.sendKeys(this.body);
 });
 
 Given("a single {string} image is attached from CurrentUser's local computer", async function (
@@ -204,10 +207,17 @@ Then("the email's details should correspond to the original draft that was sent"
     ),
   );
 
+  const subject = await driver.findElement(By.xpath(`//h2[.="${this.subject}"]`));
+  const body = await driver.findElement(
+    By.xpath(`//div[boolean(@data-message-id)]/descendant::div[.="${this.body}"]`),
+  );
+
   expect(attachment).to.be.a('object');
   expect(sender).to.be.a('object');
   expect(recipient).to.be.a('object');
   expect(cc).to.be.a('object');
+  expect(subject).to.be.a('object');
+  expect(body).to.be.a('object');
 });
 
 Given('a single {string} image is chosen to be attached from Google Drive', async function (
