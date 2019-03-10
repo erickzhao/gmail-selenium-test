@@ -6,6 +6,7 @@ const { Given, When, Then } = require('../../lib/cucumber');
 const driver = require('../../lib/driver');
 const { getUserEmail } = require('../../lib/utils');
 const locators = require('../../lib/locators');
+const { Credentials } = require('../../lib/users');
 
 Given('an email draft is addressed to {string} with {string} as a Cc', async function (
   recipient,
@@ -93,7 +94,7 @@ Then('the email should not be sent', async function () {
 
 Then("the email's details should correspond to the original draft that was sent", async function () {
   this.sentEmailLink.click();
-  await driver.wait(until.titleIs(`${this.subject} - sobbingrabbit@gmail.com - Gmail`));
+  await driver.wait(until.titleIs(`${this.subject} - ${Credentials.email} - Gmail`));
 
   const showDetails = await driver.findElement(locators.verify.sent.showDetailsButton);
   showDetails.click();

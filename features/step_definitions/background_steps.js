@@ -5,6 +5,7 @@ const { Given } = require('../../lib/cucumber');
 const driver = require('../../lib/driver');
 const { isLoggedOut } = require('../../lib/utils');
 const locators = require('../../lib/locators');
+const { Credentials } = require('../../lib/users');
 
 Given('CurrentUser is logged into the Gmail web client', async function () {
   const url = await driver.getCurrentUrl();
@@ -17,12 +18,12 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
     const emailField = driver.findElement(locators.signin.emailField);
     const nextButton = driver.findElement(locators.signin.nextButton);
 
-    await emailField.sendKeys('sobbingrabbit@gmail.com');
+    await emailField.sendKeys(Credentials.email);
     await nextButton.click();
 
     const passwordField = await driver.wait(until.elementLocated(locators.signin.passwordField));
     await driver.wait(until.elementIsVisible(passwordField));
-    await passwordField.sendKeys('ecse428winter2019');
+    await passwordField.sendKeys(Credentials.password);
 
     const submitButton = driver.findElement(locators.signin.submitButton);
     await driver.executeScript('arguments[0].click();', submitButton);
