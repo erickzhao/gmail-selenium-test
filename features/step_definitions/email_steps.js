@@ -2,43 +2,10 @@
 /* eslint-disable func-names */
 const until = require('selenium-webdriver/lib/until');
 const { expect } = require('../../lib/chai');
-const {
-  Given, When, Then, After,
-} = require('../../lib/cucumber');
+const { Given, When, Then } = require('../../lib/cucumber');
 const driver = require('../../lib/driver');
-const { getUserEmail, isLoggedOut } = require('../../lib/utils');
+const { getUserEmail } = require('../../lib/utils');
 const locators = require('../../lib/locators');
-
-Given('CurrentUser is logged into the Gmail web client', async function () {
-  const url = await driver.getCurrentUrl();
-
-  if (url.indexOf('mail.google.com') < 0) {
-    await driver.get('https://mail.google.com');
-  }
-
-  if (isLoggedOut(await driver.getCurrentUrl())) {
-    const emailField = driver.findElement(locators.signin.emailField);
-    const nextButton = driver.findElement(locators.signin.nextButton);
-
-    await emailField.sendKeys('sobbingrabbit@gmail.com');
-    await nextButton.click();
-
-    const passwordField = await driver.wait(
-      until.elementLocated(locators.signin.passwordField),
-      45 * 1000,
-    );
-    await driver.wait(until.elementIsVisible(passwordField), 45 * 1000);
-    await passwordField.sendKeys('ecse428winter2019');
-
-    const submitButton = driver.findElement(locators.signin.submitButton);
-    await driver.executeScript('arguments[0].click();', submitButton);
-  }
-});
-
-Given('CurrentUser is composing a new message', async function () {
-  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 45 * 1000);
-  await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
-});
 
 Given('an email draft is addressed to {string} with {string} as a Cc', async function (
   recipient,
@@ -225,20 +192,5 @@ Then('the user should be warned that the recipients are invalid', async function
     if (!e.message.includes('stale')) {
       throw e;
     }
-  }
-});
-
-After(async function () {
-  await driver.get('https://mail.google.com/mail/u/0/#sent');
-  await driver.wait(until.titleContains('Sent'));
-
-  const noEmails = await driver.findElements(locators.after.emptyFolder);
-
-  if (noEmails.length === 0) {
-    const selectAllButton = await driver.findElement(locators.after.selectAll);
-    await selectAllButton.click();
-    const deleteEmailsButton = await driver.findElement(locators.after.deleteSelectedEmails);
-    await driver.wait(until.elementIsVisible(deleteEmailsButton));
-    await deleteEmailsButton.click();
   }
 });
