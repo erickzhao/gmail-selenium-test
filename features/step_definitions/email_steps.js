@@ -150,14 +150,21 @@ Given('a single {string} image is chosen to be attached from Google Drive', asyn
 });
 
 Then('the draft should remain open', async function () {
-  expect(await driver.findElement(locators.compose.filledInDialog(this.subject))).to.be.a('object');
-  expect(
-    await driver.findElement(locators.verify.unsent.recipientInfo(this.recipientUser)),
-  ).to.be.a('object');
-  expect(await driver.findElement(locators.verify.unsent.ccInfo(this.ccUser))).to.be.a('object');
-  expect(
-    await driver.wait(until.elementLocated(locators.verify.unsent.subject(this.subject))),
-  ).to.be.a('object');
+  const filledInDialog = await driver.findElement(locators.compose.filledInDialog(this.subject));
+  const recipientInfo = await driver.findElement(
+    locators.verify.unsent.recipientInfo(this.recipientUser),
+  );
+  const ccInfo = await driver.findElement(locators.verify.unsent.ccInfo(this.ccUser));
+  const subject = await driver.wait(
+    until.elementLocated(locators.verify.unsent.subject(this.subject)),
+  );
+  const body = await driver.wait(until.elementLocated(locators.verify.unsent.body(this.body)));
+
+  expect(filledInDialog).to.be.a('object');
+  expect(recipientInfo).to.be.a('object');
+  expect(ccInfo).to.be.a('object');
+
+  expect(subject).to.be.a('object');
 });
 
 Then('the user should be warned that the recipients are invalid', async function () {
