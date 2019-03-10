@@ -8,26 +8,10 @@ const {
   After, Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
 const { expect } = require('../../lib/chai');
-
-const { Users } = require('../../lib/users');
+const { getUserEmail, isLoggedOut } = require('../../lib/utils');
 
 const driver = new Builder().forBrowser('chrome').build();
 setDefaultTimeout(45 * 1000);
-
-const isLoggedOut = url => url.startsWith('https://accounts.google.com/signin/');
-
-const getUserEmail = (user) => {
-  const [userType, userNumber] = user.split('-');
-  let email;
-
-  if (!userNumber) {
-    email = Users[userType];
-  } else {
-    email = Users[userType][userNumber - 1];
-  }
-
-  return email;
-};
 
 Given('CurrentUser is logged into the Gmail web client', async function () {
   const url = await driver.getCurrentUrl();
