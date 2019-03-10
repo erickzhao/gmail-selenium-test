@@ -10,7 +10,8 @@ Feature: Sending email with image attachment
     And some message is currently filled in
     And a single <filetype> image is uploaded from my local computer
     When email is sent
-    #   Then the New Message prompt is closed
+    Then an alert should appear telling CurrentUser that the email was sent
+    And the New Message prompt should be closed
     #   And the email should appear in CurrentUser's inbox
     #   And the email should appear in CurrentUser's Sent folder
     #   And the recipient should be <recipient>

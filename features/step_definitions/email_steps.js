@@ -7,9 +7,14 @@ const until = require('selenium-webdriver/lib/until');
 const {
   Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 const driver = new Builder().forBrowser('chrome').build();
-setDefaultTimeout(10 * 1000);
+setDefaultTimeout(20 * 1000);
 
 const isLoggedOut = url => url.startsWith('https://accounts.google.com/signin/');
 
@@ -37,7 +42,7 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
 });
 
 Given('CurrentUser is has the New Message prompt open', async function () {
-  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 10 * 1000);
+  await driver.wait(until.urlContains('https://mail.google.com/mail/u/0/'), 20 * 1000);
   await driver.get('https://mail.google.com/mail/u/0/#inbox?compose=new');
 });
 
@@ -69,4 +74,19 @@ Given('a single {string} image is uploaded from my local computer', async functi
 When('email is sent', async function () {
   const sendButton = driver.findElement(By.css('[aria-label^="Send"]'));
   sendButton.click();
+});
+
+Then('an alert should appear telling CurrentUser that the email was sent', async function () {
+  const alert = await driver.wait(
+    until.elementLocated(By.xpath('//div[@role="alert" and contains(., "Message sent.")]')),
+    20 * 1000,
+  );
+
+  expect(alert).to.be.a('object');
+});
+
+Then('the New Message prompt should be closed', async function () {
+  expect(
+    driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
+  ).to.be.rejectedWith('no such element');
 });
