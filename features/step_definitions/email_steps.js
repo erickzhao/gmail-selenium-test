@@ -21,20 +21,22 @@ Given('CurrentUser is logged into the Gmail web client', async function () {
   }
 
   if (isLoggedOut(await driver.getCurrentUrl())) {
-    const emailField = driver.findElement(By.id('identifierId'));
-    const nextButton = driver.findElement(By.id('identifierNext'));
+    const emailField = driver.findElement(By.xpath('//input[@id="identifierId"]'));
+    const nextButton = driver.findElement(
+      By.xpath('//div[@role="button" and @id="identifierNext"]'),
+    );
 
     await emailField.sendKeys('sobbingrabbit@gmail.com');
     await nextButton.click();
 
     const passwordField = await driver.wait(
-      until.elementLocated(By.css('input[name="password"]')),
+      until.elementLocated(By.xpath('//input[@name="password"]')),
       45 * 1000,
     );
     await driver.wait(until.elementIsVisible(passwordField), 45 * 1000);
     await passwordField.sendKeys('ecse428winter2019');
 
-    const submitButton = driver.findElement(By.id('passwordNext'));
+    const submitButton = driver.findElement(By.xpath('//div[@id="passwordNext"]'));
     await driver.executeScript('arguments[0].click();', submitButton);
   }
 });
@@ -53,17 +55,22 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   this.subject = Date.now();
   this.body = `On ${new Date().toUTCString()}, the sobbing rabbit says howdy!`;
 
-  const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 45 * 1000);
+  const toField = await driver.wait(
+    until.elementLocated(By.xpath('//textarea[@name="to"]')),
+    45 * 1000,
+  );
   await driver.wait(until.elementIsVisible(toField));
   await toField.sendKeys(this.recipientUser);
 
-  const ccButton = driver.findElement(By.css('[aria-label^="Add Cc recipients"]'));
+  const ccButton = driver.findElement(
+    By.xpath('//span[@role="link" and contains(@aria-label,"Add Cc recipients")]'),
+  );
   await ccButton.click();
-  const ccField = driver.findElement(By.css('textarea[name="cc"]'));
+  const ccField = driver.findElement(By.xpath('//textarea[@name="cc"]'));
   await driver.wait(until.elementIsVisible(ccField));
   await ccField.sendKeys(this.ccUser);
 
-  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
+  const subjectField = driver.findElement(By.xpath('//input[@name="subjectbox"]'));
   await driver.wait(until.elementIsVisible(subjectField));
   await subjectField.sendKeys(`${this.subject}`);
 
@@ -81,7 +88,9 @@ Given("a single {string} image is attached from CurrentUser's local computer", a
 });
 
 When('email is sent', async function () {
-  const sendButton = driver.findElement(By.css('[aria-label^="Send"]'));
+  const sendButton = driver.findElement(
+    By.xpath('//div[@role="button" and contains(@aria-label,"Send")]'),
+  );
   sendButton.click();
 });
 
@@ -118,13 +127,7 @@ Then('the email should be sent', async function () {
   await driver.wait(until.titleContains('Inbox'));
 
   this.sentEmailLink = driver.wait(
-    until.elementLocated(
-      By.xpath(
-        `//div[@role="main"]/descendant::span[contains(., "${
-          this.subject
-        }") and boolean(@data-thread-id)]/ancestor::div[@role="link"]`,
-      ),
-    ),
+    until.elementLocated(By.xpath(`//tr[contains(., "${this.subject}")]`), 10 * 1000),
   );
 
   expect(this.sentEmailLink).to.be.a('object');
@@ -243,7 +246,7 @@ Given('a single {string} image is chosen to be attached from Google Drive', asyn
 
 Then('the draft should remain open', async function () {
   expect(
-    await driver.findElement(By.xpath('//div[@role="dialog" and contains(., "New Message")]')),
+    await driver.findElement(By.xpath(`//div[@role="dialog" and contains(., "${this.subject}")]`)),
   ).to.be.a('object');
   expect(
     await driver.findElement(
