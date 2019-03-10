@@ -5,7 +5,7 @@ require('chromedriver');
 const { Builder, By } = require('selenium-webdriver');
 const until = require('selenium-webdriver/lib/until');
 const {
-  Given, setDefaultTimeout, Then, When,
+  After, Given, setDefaultTimeout, Then, When,
 } = require('cucumber');
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
@@ -78,6 +78,7 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   const ccButton = driver.findElement(By.css('[aria-label^="Add Cc recipients"]'));
   await ccButton.click();
   const ccField = driver.findElement(By.css('textarea[name="cc"]'));
+  await driver.wait(until.elementIsVisible(ccField));
   await ccField.sendKeys(this.ccUser);
   await subjectField.sendKeys(`${this.subject}`);
 });
@@ -309,5 +310,24 @@ Then('the user should be warned that the recipients are invalid', async function
     if (!e.message.includes('stale')) {
       throw e;
     }
+  }
+});
+
+After(async function () {
+  await driver.get('https://mail.google.com/mail/u/0/#sent');
+  await driver.wait(until.titleContains('Sent'));
+
+  const noEmails = await driver.findElements(By.xpath('//td[contains(., "No sent messages")]'));
+
+  if (noEmails.length === 0) {
+    const selectAllButton = await driver.findElement(
+      By.xpath(
+        '//div[@aria-label="Select" and not(ancestor::div[contains(@style, "display: none")])]',
+      ),
+    );
+    await selectAllButton.click();
+    const deleteEmailsButton = await driver.findElement(By.xpath('//div[@aria-label="Delete"]'));
+    await driver.wait(until.elementIsVisible(deleteEmailsButton));
+    await deleteEmailsButton.click();
   }
 });
