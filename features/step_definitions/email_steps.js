@@ -70,15 +70,21 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   this.body = `On ${new Date().toUTCString()}, the sobbing rabbit says howdy!`;
 
   const toField = await driver.wait(until.elementLocated(By.css('[name="to"]')), 45 * 1000);
-  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
+  await driver.wait(until.elementIsVisible(toField));
   await toField.sendKeys(this.recipientUser);
+
   const ccButton = driver.findElement(By.css('[aria-label^="Add Cc recipients"]'));
   await ccButton.click();
   const ccField = driver.findElement(By.css('textarea[name="cc"]'));
   await driver.wait(until.elementIsVisible(ccField));
   await ccField.sendKeys(this.ccUser);
+
+  const subjectField = driver.findElement(By.css('[name="subjectbox"]'));
+  await driver.wait(until.elementIsVisible(subjectField));
   await subjectField.sendKeys(`${this.subject}`);
+
   const bodyField = driver.findElement(By.xpath('//div[@aria-label="Message Body"]'));
+  await driver.wait(until.elementIsVisible(bodyField));
   await bodyField.sendKeys(this.body);
 });
 
