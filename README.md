@@ -39,7 +39,7 @@ A separate scenario outline was used for each one of these flows, with a set of 
 
 ```
 Normal flow: Sending emails to a valid recipient using files from Computer
-Given I have an email draft is addressed to someone with someone else as a Cc
+Given I have an email draft addressed to someone with someone else as a Cc
 And I have chosen a single image to be attached from my local computer
 When I send the email
 Then I should be alerted that the email was sent successfully
@@ -52,7 +52,7 @@ And the email's details should correspond to the original draft that was sent
 
 ```
 Scenario Outline: Sending emails to a valid recipient using files from Google Drive
-Given I have an email draft is addressed to someone with someone else as a Cc
+Given I have an email draft addressed to someone with someone else as a Cc
 And I have chosen a single image to be attached from Google Drive
 When I send the email
 Then I should be alerted that the email was sent successfully
@@ -65,7 +65,7 @@ And the email's details should correspond to the original draft that was sent
 
 ```
 Error flow: Sending emails with an image attachment to an invalid recipient
-Given an email draft is addressed to someone with someone else as a Cc
+Given an email draft addressed to someone with someone else as a Cc (with one email invalid)
 And I have chosen a single image to be attached from my local computer
 When I send the email
 Then the draft should remain open
@@ -85,10 +85,10 @@ Feature: Sending email with image attachment
     And CurrentUser is composing a new message
 
   Scenario Outline: Sending emails to a valid recipient using files from Computer (Normal Flow)
-    Given an email draft is addressed to <recipient> with <cc> as a Cc
-    And a single <filetype> image is attached from CurrentUser's local computer
-    When email is sent
-    Then CurrentUser should be alerted that the email was sent successfully
+    Given I have an email draft addressed to <recipient> with <cc> as a Cc
+    And I have chosen a single <filetype> image to be attached from my local computer
+    When I send the email
+    Then I should be alerted that the email was sent successfully
     And the draft should no longer be available
     And the email should be sent
     And the email's details should correspond to the original draft that was sent
@@ -102,10 +102,10 @@ Feature: Sending email with image attachment
       | "OtherUser-5" | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to a valid recipient using files from Google Drive (Alternate Flow)
-    Given an email draft is addressed to <recipient> with <cc> as a Cc
+    Given I have an email draft addressed to <recipient> with <cc> as a Cc
     And a single <filetype> image is chosen to be attached from Google Drive
-    When email is sent
-    Then CurrentUser should be alerted that the email was sent successfully
+    When I send the email
+    Then I should be alerted that the email was sent successfully
     And the draft should no longer be available
     And the email should be sent
     And the email's details should correspond to the original draft that was sent
@@ -119,11 +119,11 @@ Feature: Sending email with image attachment
       | "OtherUser-5" | "CurrentUser" | ".svg"   |
 
   Scenario Outline: Sending emails to invalid recipient using files from Computer (Error Flow)
-    Given an email draft is addressed to <recipient> with <cc> as a Cc
-    And a single <filetype> image is attached from CurrentUser's local computer
-    When email is sent
+    Given I have an email draft addressed to <recipient> with <cc> as a Cc
+    And I have chosen a single <filetype> image to be attached from my local computer
+    When I send the email
     Then the draft should remain open
-    And the user should be warned that the recipients are invalid
+    And I should be warned that the recipients are invalid
     And the email should not be sent
     Examples:
       | recipient       | cc              | filetype |

@@ -8,7 +8,7 @@ const { getUserEmail, goToInboxFolder, goToSentFolder } = require('../../lib/uti
 const locators = require('../../lib/locators');
 const { Credentials } = require('../../lib/users');
 
-Given('an email draft is addressed to {string} with {string} as a Cc', async function (
+Given('I have an email draft addressed to {string} with {string} as a Cc', async function (
   recipient,
   Cc,
 ) {
@@ -41,7 +41,7 @@ Given('an email draft is addressed to {string} with {string} as a Cc', async fun
   await bodyField.sendKeys(this.body);
 });
 
-Given("a single {string} image is attached from CurrentUser's local computer", async function (
+Given('I have chosen a single {string} image to be attached from my local computer', async function (
   extension,
 ) {
   // normal flow: attach image from /images folder.
@@ -51,12 +51,12 @@ Given("a single {string} image is attached from CurrentUser's local computer", a
   await attachButton.sendKeys(`${process.cwd()}/images/howdy${this.attachmentExtension}`);
 });
 
-When('email is sent', async function () {
+When('I send the email', async function () {
   const sendButton = driver.findElement(locators.compose.sendButton);
   sendButton.click();
 });
 
-Then('CurrentUser should be alerted that the email was sent successfully', async function () {
+Then('I should be alerted that the email was sent successfully', async function () {
   // alert only shows matching message after message is successfully sent
   const alert = await driver.wait(until.elementLocated(locators.send.sentAlert));
   expect(alert).to.be.a('object');
@@ -181,7 +181,7 @@ Then('the draft should remain open', async function () {
   expect(body).to.be.a('object');
 });
 
-Then('the user should be warned that the recipients are invalid', async function () {
+Then('I should be warned that the recipients are invalid', async function () {
   // modal should pop up warning us of error
   expect(await driver.wait(until.elementLocated(locators.send.invalidAlert))).to.be.a('object');
 
