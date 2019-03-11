@@ -296,5 +296,5 @@ Inside the GitHub repository (and this submission), there are the following fold
 
 ## Links
 
-- 📼 Screen recording: [https://youtu.be/tqemFJIeJKU](https://youtu.be/tqemFJIeJKU)
+- 📼 Screen recording: [https://www.youtube.com/watch?v=maewsZztNZU](https://www.youtube.com/watch?v=maewsZztNZU)
 - 👩‍💻 Code repository: [https://github.com/erickzhao/gmail-selenium-test](https://github.com/erickzhao/gmail-selenium-test)
