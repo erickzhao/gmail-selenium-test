@@ -142,21 +142,21 @@ My test approach involved using three Scenario Outlines to mix and match the 3 f
 
 First, I set up the initial state before each scenario by ensuring login status and navigating to the inbox page. This was done in the `Background` step of my Gherkin feature.
 
-For each case, I sent composed a draft with a unique subject and body (based on the timestamp of when the acceptance tests were run), which were saved later for assertion purposes. Then, I attempted to send the email to both an exterior user and to myself from my test account (whether I was the main recipient or the Cc varied between the permutations).
+For each case, I composed a draft with a unique subject and body (with timestamp of when the tests were run), which were saved later for assertions. Then, I sent the email to both another user and myself (I was either the recipient or the Cc in each case).
 
-Since each email was eventually sent to my inbox, I checked both the Inbox and Sent folders of my test account for a matching subject (corresponding to my previous timestamp). I then clicked on the email and validated if the information corresponded to what I had composed in my draft (subject, body, sender, recipient, cc, and attachment file name).
+Ergo,since each email was sent to my inbox, I checked both my the Inbox and Sent folders for a subject with a matching timestamp. I then clicked on the email and validated if its details corresponded to my draft (subject, body, sender, recipient, cc, and attachment file name).
 
 After each scenario was run, I then cleared my Inbox and Sent folders, as well as discarded any existing drafts, to reset the system to its initial state.
 
 ### Dependencies
 
-This assignment was written in **JavaScript** using the [NodeJS](https://nodejs.org/en/) runtime and the [npm](https://www.npmjs.com/) package manager. The project was built using Selenium Webdriver (with ChromeDriver for running the acceptance tests), Cucumber to automate the user story flows into acceptance tests, and Chai as an assertion library to validate the `Then` steps in the acceptance tests.
+This assignment was written in **JavaScript** using the [NodeJS](https://nodejs.org/en/) runtime and the [npm](https://www.npmjs.com/) package manager. The project was built using Selenium Webdriver (with ChromeDriver for running the tests), Cucumber to automate the stories into acceptance tests, and Chai as an assertion library.
 
 Here are the versions of the dependencies specified by the `package.json`:
 
 - `"chai": "^4.2.0",` - Chai is an BDD assertion library ([See documentation here](https://www.chaijs.com/)).
 - `"chai-as-promised": "^7.1.1",` - A plugin for Chai to support assertions for asynchronous [JavaScript Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) ([see documentation here](https://www.chaijs.com/plugins/chai-as-promised/)).
-- `"chromedriver": "^2.46.0",` - npm wrapper used to fetch the corresponding version of ChromeDriver ([see documentation here](https://www.npmjs.com/package/chromedriver)). [ChromeDriver](http://chromedriver.chromium.org/) itself is a standalone Chromium server implementing the WebDriver protocol. It is used in conjunction with Selenium to run acceptance tests.
+- `"chromedriver": "^2.46.0",` - npm wrapper used to fetch the corresponding version of ChromeDriver ([see documentation here](https://www.npmjs.com/package/chromedriver)). [ChromeDriver](http://chromedriver.chromium.org/) itself is a standalone server implementing the WebDriver protocol. Used alongside Selenium to run acceptance tests.
 - `"cucumber": "^5.1.0",` - A JavaScript implementation of the Cucumber tool to run plain language automated tests ([see documentation here](https://www.npmjs.com/package/cucumber)).
 - `"selenium-webdriver": "^4.0.0-alpha.1"` - JavaScript bindings for the Selenium automation library ([see documentation here](https://seleniumhq.github.io/selenium/docs/api/javascript/)).
 
@@ -168,29 +168,29 @@ All tests were run on macOS Mojave 10.14.3 with a 2018-model Macbook Pro with a 
 
 ### Test account
 
-A fresh Gmail account was created for the purposes of this exercise. Since the alternate flow for the project requires image attachments from Google Drive, I had to manually upload the five images from the `/images/` folder into my test account's Google Drive folder.
+A fresh Gmail account was created for my purposes. Since the alternate flows required attachments from Google Drive, I had upload the five images from the `/images/` folder into my test account's Google Drive.
 
 ### Pros and cons of approach taken
 
-A few aspects of my approach had some tradeoffs,which I outline in the sections below.
+A few aspects of my approach had some tradeoffs, which I outline below.
 
 #### Sending emails to myself
 
-The main peculiarity of my approach was that I always sent the email back to myself. This allowed me to ensure that my email was successfully delivered, since I could check if one of the recipients (my test account) had indeed recieved the email. This is a more robust check than just inspecting my Sent folder (because there could have been a breakdown between the email going to my outbox and the recipient receiving the email). It also allows me to perform such a check without validating with an external API call (or navigation) to another email's inbox, which would add a lot more complexity to the project.
+The main peculiarity of my approach was that I always sent the email back to myself. This allowed me to ensure that my email was successfully delivered, since I could check if my test account had recieved the email. This is a more robust check than just inspecting my Sent folder (because there could have been a breakdown between the email going to my outbox and the recipient receiving the email). It also allows me to perform such a check without validating with an external API call to another email's inbox
 
-However, this approach has its downsides, since it does not reflect a very common real-world use-case. People rarely send emails to themselves, unless they want to send themselves a file for later.
+However, this approach does not reflect a very common real-world use-case. People rarely need to send emails to themselves.
 
 #### Checking file validity
 
-To validate that the image attachment was indeed uploaded correctly, I simply checked if the file that appeared as an attachment had a matching name (including the extension). This is a quick and easy way that naively trusts Gmail's image attachment system to not corrupt the image. However, the best way to see if the image was indeed uploaded correctly would be to download it and compare the binary to the originally uploaded picture. I believed this to be out of scope of the assignment, and did not take the time to do so.
+To validate that the image attachment was indeed uploaded correctly, I simply checked if the sent email's attachment had a matching name and extension. This is aneasy way that trusts that the image was not corrupted. However, the best way to see if the attachment was uploaded correctly would be to download it and compare the binary to the original picture. This seemed out of scope to me, though.
 
 #### Teardown
 
-The post-scenario teardown step in my code implemented in `/features/step_definitions/after)steps.js` ([GitHub link here](https://github.com/erickzhao/gmail-selenium-test/blob/master/features/step_definitions/after_steps.js)) sets a clean slate by deleting all emails sent. This is fine and easy because I'm using a test account. However, to more accurately replicate real-world usage, we would want to only delete the email that was sent within the scenario.
+The teardown step in my code is implemented in `/features/step_definitions/after)steps.js`. It sets a clean slate by deleting all emails sent. This is fine because I'm using a test account. However, to more accurately replicate real-world usage, we would want to only delete the test email that was sent within the scenario.
 
 ### Specific locators
 
-The Selenium locators I used to run the browser automation are specific to the [Document Object Model](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction) of the Gmail client, with many relying on ancestor, sibling, or descendant selectors, and some even relying on the inner texts within the elements. This makes the tests less robust than having specific IDs or CSS classes to target. However, this was probably my best approach given that we were running tests on the production build of Gmail, with the IDs and CSS classes obfuscated and changing with each instance of the web client. My approach might have been different had I had access to a development build with legible, static class names and IDs.
+The Selenium locators I used to run the browser automation are specific to the [Document Object Model](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction) of the Gmail client, with many relying on XPath axes (ancestor, descendant, etc.) and the inner texts of the elements. This makes the tests more vulnerable to DOM shifts than having specific IDs or CSS classes to target. However, this was probably my best approach given that we were running tests on the production build of Gmail, with the IDs and CSS classes obfuscated and changing with each instance. My approach might have been different had I had access to a development build with legible, static class names and IDs.
 
 Using inner texts also means that I cannot testing across different localizations of the Gmail client. This was fine since testing in multiple locales was out of the scope of this project, but this is still a vulnerability nonetheless.
 
@@ -206,7 +206,7 @@ In the previous section, I discussed some tradeoffs with the robustness of my ap
 
 ### If the web interface changed
 
-I discussed this in detail in the section above ([link here](#specific-locators)), but the gist of it is that my approach is fairly vulnerable to changes in the HTML DOM (due to use of very specific locators being used to run Selenium tasks), but this is partially due to me having to run automation on a production build of Gmail. In its current state of my project, if the UI changed, I would have to rebind all outdated selectors.
+I discussed this in more detail in the section above ([link here](#specific-locators)), but the gist of it is that my approach is fairly vulnerable to changes in the HTML DOM. In its current state of my project, if the UI changed, I would have to rebind all outdated selectors.
 
 ## Installation
 
