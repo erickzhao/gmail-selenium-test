@@ -1,7 +1,7 @@
 {
   "name": "gmail-selenium-test",
   "version": "0.1.0",
-  "description": "E2E testing Gmail (sending mail + image attachments)",
+  "description": "Cucumber in Agile Story Test Automation",
   "main": "index.js",
   "scripts": {
     "test": "cucumber-js"
